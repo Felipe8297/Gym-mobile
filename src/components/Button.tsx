@@ -1,6 +1,6 @@
 import { Button as NativeBaseButton, IButtonProps, Text } from 'native-base'
 
-interface ButtonProps extends IButtonProps {
+type ButtonProps = IButtonProps & {
   title: string
   variant?: 'solid' | 'outline'
 }
