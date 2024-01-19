@@ -99,10 +99,18 @@ export function Profile() {
             bg="gray.600"
             placeholder="E-mail"
             isDisabled
-            _disabled={{ bg: 'gray.600' }}
+            isReadOnly
+            _disabled={{ bgColor: 'gray.600' }}
           />
 
-          <Heading color="gray.200" fontSize="md" mb={2} mt={12} mr="auto">
+          <Heading
+            color="gray.200"
+            fontSize="md"
+            mb={2}
+            mt={12}
+            mr="auto"
+            fontFamily="heading"
+          >
             Alterar senha
           </Heading>
           <Input placeholder="Senha antiga" bg="gray.600" secureTextEntry />
