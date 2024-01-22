@@ -11,26 +11,26 @@ import { Input } from '@/components/Input'
 import { AuthRoutesProps } from '@/routes/auth.routes'
 
 type SignUpFormData = {
-  userName: string
+  name: string
   email: string
   password: string
   confirmedPassword: string
 }
 
-const SignUpSchema = yup.object({
-  userName: yup.string().required('Informe o nome.'),
+const signUpSchema = yup.object({
+  name: yup.string().required('Informe o nome.'),
   email: yup.string().required('Informe o e-mail.').email('E-mail inválido.'),
   password: yup
     .string()
-    .required('Informe a senha.')
+    .required('Informe a senha')
     .min(6, 'A senha deve conter 6 caracteres.'),
   confirmedPassword: yup
     .string()
-    .required('Confirme a senha')
-    .oneOf([null, yup.ref('password')], 'As senhas não coincidem'),
+    .required('Confirme a senha.')
+    .oneOf([yup.ref('password'), null], 'As senhas não coincidem.'),
 })
 
-type FormData = yup.InferType<typeof SignUpSchema>
+type FormData = yup.InferType<typeof signUpSchema>
 
 export function SignUp() {
   const {
@@ -38,21 +38,22 @@ export function SignUp() {
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
-    resolver: yupResolver(SignUpSchema),
+    resolver: yupResolver(signUpSchema),
     defaultValues: {
-      userName: '',
+      name: '',
       email: '',
       password: '',
       confirmedPassword: '',
     },
   })
+
   const navigation = useNavigation<AuthRoutesProps>()
 
   function handleGoBack() {
     navigation.goBack()
   }
 
-  function handleSignUp({ userName, email, password }: SignUpFormData) {
+  async function handleSignUp({ name, email, password }: SignUpFormData) {
     try {
       fetch('http://192.168.15.11:3333/users', {
         method: 'POST',
@@ -60,7 +61,7 @@ export function SignUp() {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userName, email, password }),
+        body: JSON.stringify({ name, email, password }),
       })
     } catch (error) {
       console.error(error)
@@ -96,13 +97,13 @@ export function SignUp() {
 
           <Controller
             control={control}
-            name="userName"
+            name="name"
             render={({ field: { onChange, value } }) => (
               <Input
                 placeholder="Nome"
                 onChangeText={onChange}
                 value={value}
-                errorMessage={errors.userName?.message}
+                errorMessage={errors.name?.message}
               />
             )}
           />
