@@ -8,6 +8,7 @@ import BackgroundImg from '@/assets/background.png'
 import LogoSvg from '@/assets/logo.svg'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
+import { AuthRoutesProps } from '@/routes/auth.routes'
 
 type SignUpFormData = {
   userName: string
@@ -32,8 +33,6 @@ const SignUpSchema = yup.object({
 type FormData = yup.InferType<typeof SignUpSchema>
 
 export function SignUp() {
-  const navigation = useNavigation()
-
   const {
     control,
     handleSubmit,
@@ -47,13 +46,25 @@ export function SignUp() {
       confirmedPassword: '',
     },
   })
+  const navigation = useNavigation<AuthRoutesProps>()
 
   function handleGoBack() {
     navigation.goBack()
   }
 
-  function handleSignUp(data: SignUpFormData) {
-    console.log(data)
+  function handleSignUp({ userName, email, password }: SignUpFormData) {
+    try {
+      fetch('http://192.168.15.11:3333/users', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userName, email, password }),
+      })
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (
@@ -61,19 +72,20 @@ export function SignUp() {
       contentContainerStyle={{ flexGrow: 1 }}
       showsVerticalScrollIndicator={false}
     >
-      <VStack flex={1} px={10}>
+      <VStack flex={1} px={10} pb={16}>
         <Image
           source={BackgroundImg}
           defaultSource={BackgroundImg}
-          alt="Logo "
+          alt="Logo"
           resizeMode="contain"
           position="absolute"
         />
 
         <Center my={24}>
           <LogoSvg />
+
           <Text color="gray.100" fontSize="sm">
-            Treine sua mente e o seu corpo
+            Treine sua mente e o seu corpo.
           </Text>
         </Center>
 
@@ -81,6 +93,7 @@ export function SignUp() {
           <Heading color="gray.100" fontSize="xl" mb={6} fontFamily="heading">
             Crie sua conta
           </Heading>
+
           <Controller
             control={control}
             name="userName"
@@ -128,7 +141,7 @@ export function SignUp() {
             name="confirmedPassword"
             render={({ field: { onChange, value } }) => (
               <Input
-                placeholder="Confirmar a senha"
+                placeholder="Confirmar a Senha"
                 secureTextEntry
                 onChangeText={onChange}
                 value={value}
