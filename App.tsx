@@ -7,6 +7,7 @@ import { NativeBaseProvider } from 'native-base'
 import { StatusBar } from 'react-native'
 
 import { Loading } from '@/components/Loading'
+import { AuthContextProvider } from '@/contexts/AuthContext'
 import { Routes } from '@/routes'
 import { Theme } from '@/theme'
 
@@ -22,7 +23,9 @@ export default function App() {
         backgroundColor="transparent"
         translucent
       />
-      {fontsLoaded ? <Routes /> : <Loading />}
+      <AuthContextProvider>
+        {fontsLoaded ? <Routes /> : <Loading />}
+      </AuthContextProvider>
     </NativeBaseProvider>
   )
 }

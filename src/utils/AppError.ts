@@ -1,5 +1,5 @@
 export class AppError {
-  message: string | undefined
+  message: string
 
   constructor(message: string) {
     this.message = message
