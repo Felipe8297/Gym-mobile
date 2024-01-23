@@ -2,15 +2,24 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { Heading, HStack, Icon, Text, VStack } from 'native-base'
 import { TouchableOpacity } from 'react-native'
 
+import defaultUserPhoto from '@/assets/userPhotoDefault.png'
+import { useAuth } from '@/hooks/useAuth'
+
 import { UserPhoto } from './UserPhoto'
 
 export function HomeHeader() {
+  const { user } = useAuth()
+
   return (
     <HStack bg="gray.600" pt={16} pb={5} px={8} alignItems="center">
       <UserPhoto
-        source={{
-          uri: 'https://image-cdn.essentiallysports.com/wp-content/uploads/Chris-Bumstead-1-1-740x710.jpg',
-        }}
+        source={
+          user.avatar
+            ? {
+                uri: user.avatar,
+              }
+            : defaultUserPhoto
+        }
         size={16}
         mr={4}
       />
@@ -20,7 +29,7 @@ export function HomeHeader() {
         </Text>
 
         <Heading color="gray.100" fontSize="md" fontFamily="heading">
-          Chris Bumstead
+          {user.name}
         </Heading>
       </VStack>
       <TouchableOpacity>
