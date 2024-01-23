@@ -18,11 +18,10 @@ export const AuthContext = createContext<AuthContextDataProps>(
 )
 
 export function AuthContextProvider({ children }: AuthContextProviderProps) {
-  const [user, setUser] = useState({} as UserDTO)
+  const [user, setUser] = useState<UserDTO>({} as UserDTO)
 
   async function singIn(email: string, password: string) {
     try {
-      // se der erro alguma hora verificar esse bloco de código
       const { data } = await api.post('/sessions', { email, password })
 
       if (data.user) {
