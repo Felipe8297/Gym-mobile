@@ -16,6 +16,7 @@ import BackgroundImg from '@/assets/background.png'
 import LogoSvg from '@/assets/logo.svg'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
+import { useAuth } from '@/hooks/useAuth'
 import { AuthRoutesProps } from '@/routes/auth.routes'
 import { api } from '@/services/api'
 import { AppError } from '@/utils/AppError'
@@ -46,7 +47,7 @@ export function SignUp() {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: yupResolver(signUpSchema),
     defaultValues: {
@@ -59,6 +60,7 @@ export function SignUp() {
 
   const navigation = useNavigation<AuthRoutesProps>()
   const toast = useToast()
+  const { singIn } = useAuth()
 
   function handleGoBack() {
     navigation.goBack()
@@ -66,6 +68,8 @@ export function SignUp() {
 
   async function handleSignUp({ name, email, password }: SignUpFormData) {
     try {
+      // simulando uma requisição que pode demorar para testar o loading
+      await new Promise((resolve) => setTimeout(resolve, 3000))
       const response = await api.post('/users', { name, email, password })
       if (response.status === 201) {
         toast.show({
@@ -73,7 +77,7 @@ export function SignUp() {
           placement: 'top',
           bgColor: 'green.600',
         })
-        navigation.navigate('signIn')
+        singIn(email, password)
       }
       console.log(response.data)
     } catch (error) {
@@ -179,6 +183,8 @@ export function SignUp() {
           <Button
             title="Criar e acessar"
             onPress={handleSubmit(handleSignUp)}
+            isLoading={isSubmitting}
+            _loading={{ bg: 'green.500' }}
           />
         </Center>
 

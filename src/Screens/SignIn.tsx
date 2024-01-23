@@ -40,6 +40,7 @@ export function SignIn() {
 
   async function handleSignIn({ email, password }: FormData) {
     try {
+      // simulando uma requisição que pode demorar para testar o loading
       await new Promise((resolve) => setTimeout(resolve, 3000))
       await singIn(email, password)
     } catch (error) {
