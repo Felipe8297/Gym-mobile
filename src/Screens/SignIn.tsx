@@ -31,7 +31,7 @@ export function SignIn() {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<FormData>()
 
   function handleNewAccount() {
@@ -40,16 +40,19 @@ export function SignIn() {
 
   async function handleSignIn({ email, password }: FormData) {
     try {
+      await new Promise((resolve) => setTimeout(resolve, 3000))
       await singIn(email, password)
     } catch (error) {
       const isAppError = error instanceof AppError
-      const message = isAppError
+
+      const title = isAppError
         ? error.message
         : 'Erro ao fazer login. Tente novamente mais tarde.'
+
       toast.show({
-        title: message,
+        title,
         placement: 'top',
-        bgColor: 'amber.500',
+        bgColor: 'red.500',
       })
     }
   }
@@ -110,7 +113,12 @@ export function SignIn() {
             )}
           />
 
-          <Button title="Acessar" onPress={handleSubmit(handleSignIn)} />
+          <Button
+            title="Acessar"
+            onPress={handleSubmit(handleSignIn)}
+            isLoading={isSubmitting}
+            _loading={{ bg: 'green.500' }}
+          />
         </Center>
 
         <Center mt={24}>

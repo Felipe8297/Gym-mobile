@@ -1,7 +1,8 @@
-import { createContext, ReactNode, useState } from 'react'
+import { createContext, ReactNode, useEffect, useState } from 'react'
 
 import { UserDTO } from '@/dtos/UserDTO'
 import { api } from '@/services/api'
+import { storageUserGet, storageUserSave } from '@/storage/storageUser'
 
 export type AuthContextDataProps = {
   user: UserDTO
@@ -22,15 +23,28 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   async function singIn(email: string, password: string) {
     try {
       // se der erro alguma hora verificar esse bloco de código
-      const response = await api.post('/sessions', { email, password })
+      const { data } = await api.post('/sessions', { email, password })
 
-      if (response.data.user) {
-        setUser(response.data.user)
+      if (data.user) {
+        setUser(data.user)
+        storageUserSave(data.user)
       }
     } catch (error) {
       throw new Error(error)
     }
   }
+
+  async function loadUserData() {
+    const userLogged = await storageUserGet()
+
+    if (userLogged) {
+      setUser(userLogged)
+    }
+  }
+
+  useEffect(() => {
+    loadUserData()
+  }, [])
 
   return (
     <AuthContext.Provider value={{ user, singIn }}>
