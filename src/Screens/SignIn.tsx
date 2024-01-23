@@ -1,12 +1,22 @@
 import { useNavigation } from '@react-navigation/native'
-import { Center, Heading, Image, ScrollView, Text, VStack } from 'native-base'
+import {
+  Center,
+  Heading,
+  Image,
+  ScrollView,
+  Text,
+  useToast,
+  VStack,
+} from 'native-base'
 import { Controller, useForm } from 'react-hook-form'
 
 import BackgroundImg from '@/assets/background.png'
 import LogoSvg from '@/assets/logo.svg'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
+import { useAuth } from '@/hooks/useAuth'
 import { AuthRoutesProps } from '@/routes/auth.routes'
+import { AppError } from '@/utils/AppError'
 
 type FormData = {
   email: string
@@ -14,7 +24,9 @@ type FormData = {
 }
 
 export function SignIn() {
+  const { singIn } = useAuth()
   const navigation = useNavigation<AuthRoutesProps>()
+  const toast = useToast()
 
   const {
     control,
@@ -26,8 +38,20 @@ export function SignIn() {
     navigation.navigate('signUp')
   }
 
-  function handleSignIn({ email, password }: FormData) {
-    console.log(email, password)
+  async function handleSignIn({ email, password }: FormData) {
+    try {
+      await singIn(email, password)
+    } catch (error) {
+      const isAppError = error instanceof AppError
+      const message = isAppError
+        ? error.message
+        : 'Erro ao fazer login. Tente novamente mais tarde.'
+      toast.show({
+        title: message,
+        placement: 'top',
+        bgColor: 'amber.500',
+      })
+    }
   }
 
   return (
