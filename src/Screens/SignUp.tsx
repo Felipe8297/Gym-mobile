@@ -79,7 +79,6 @@ export function SignUp() {
         })
         singIn(email, password)
       }
-      console.log(response.data)
     } catch (error) {
       const isAppError = error instanceof AppError
 
