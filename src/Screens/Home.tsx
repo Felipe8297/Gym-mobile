@@ -5,13 +5,14 @@ import { useCallback, useEffect, useState } from 'react'
 import { ExerciseCard } from '@/components/ExerciseCard'
 import { Group } from '@/components/Group'
 import { HomeHeader } from '@/components/HomeHeader'
+import { ExerciseDTO } from '@/dtos/ExerciseDTO'
 import { AppRoutesProps } from '@/routes/app.routes'
 import { api } from '@/services/api'
 import { AppError } from '@/utils/AppError'
 
 export function Home() {
   const [groups, setGroups] = useState<string[]>([])
-  const [exercises, setExercises] = useState([])
+  const [exercises, setExercises] = useState<ExerciseDTO[]>([])
   const [groupSelected, setGroupSelected] = useState('Bíceps')
 
   const navigation = useNavigation<AppRoutesProps>()
@@ -38,10 +39,10 @@ export function Home() {
     }
   }
 
-  async function fetchExercises() {
+  async function fetchExercisesByGroup() {
     try {
       const response = await api.get(`/exercises/bygroup/${groupSelected}`)
-      console.log(response.data)
+      setExercises(response.data)
     } catch (error) {
       const isAppError = error instanceof AppError
       const title = isAppError
@@ -61,7 +62,7 @@ export function Home() {
 
   useFocusEffect(
     useCallback(() => {
-      fetchExercises()
+      fetchExercisesByGroup()
     }, [groupSelected]),
   )
 
@@ -98,12 +99,9 @@ export function Home() {
         </HStack>
         <FlatList
           data={exercises}
-          keyExtractor={(item) => item}
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <ExerciseCard
-              exerciseName={item}
-              onPress={handleOpenExerciseDetails}
-            />
+            <ExerciseCard data={item} onPress={handleOpenExerciseDetails} />
           )}
           showsVerticalScrollIndicator={false}
           _contentContainerStyle={{ paddingBottom: 20 }}
