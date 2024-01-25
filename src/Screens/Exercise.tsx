@@ -1,5 +1,5 @@
 import { Feather } from '@expo/vector-icons'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import {
   Box,
   Center,
@@ -19,8 +19,15 @@ import SeriesSvg from '@/assets/series.svg'
 import { Button } from '@/components/Button'
 import { AppRoutesProps } from '@/routes/app.routes'
 
+type RouteParams = {
+  exerciseId: string
+}
+
 export function Exercise() {
   const navigation = useNavigation<AppRoutesProps>()
+  const route = useRoute()
+
+  const { exerciseId } = route.params as RouteParams
 
   function handleGoBack() {
     navigation.goBack()

@@ -2,7 +2,6 @@ import {
   BottomTabNavigationProp,
   createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs'
-import { DefaultTheme } from '@react-navigation/native'
 import { useTheme } from 'native-base'
 import { Platform } from 'react-native'
 
@@ -18,7 +17,7 @@ type AppRoutes = {
   home: undefined
   history: undefined
   profile: undefined
-  exercise: undefined
+  exercise: { exerciseId: string }
 }
 
 export type AppRoutesProps = BottomTabNavigationProp<AppRoutes>

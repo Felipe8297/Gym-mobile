@@ -3,6 +3,7 @@ import { Heading, HStack, Icon, Image, Text, VStack } from 'native-base'
 import { TouchableOpacity, TouchableOpacityProps } from 'react-native'
 
 import { ExerciseDTO } from '@/dtos/ExerciseDTO'
+import { api } from '@/services/api'
 
 type ExerciseCardProps = TouchableOpacityProps & {
   data: ExerciseDTO
@@ -20,7 +21,7 @@ export function ExerciseCard({ data, ...rest }: ExerciseCardProps) {
       >
         <Image
           source={{
-            uri: 'https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_639,h_827/https://strengthbible.com/wp-content/uploads/2023/12/cbum-instagram.png',
+            uri: `${api.defaults.baseURL}/exercises/thumb/${data.thumb}`,
           }}
           alt="Rosca martelo com halteres"
           h={16}
