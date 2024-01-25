@@ -21,7 +21,7 @@ export function ExerciseCard({ data, ...rest }: ExerciseCardProps) {
       >
         <Image
           source={{
-            uri: `${api.defaults.baseURL}/exercises/thumb/${data.thumb}`,
+            uri: `${api.defaults.baseURL}/exercise/thumb/${data.thumb}`,
           }}
           alt="Rosca martelo com halteres"
           h={16}
