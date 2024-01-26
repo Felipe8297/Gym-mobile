@@ -8,10 +8,10 @@ import { Platform } from 'react-native'
 import HistorySvg from '@/assets/history.svg'
 import HomeSvg from '@/assets/home.svg'
 import ProfileSvg from '@/assets/profile.svg'
-import { Exercise } from '@/Screens/Exercise'
-import { History } from '@/Screens/History'
-import { Home } from '@/Screens/Home'
-import { Profile } from '@/Screens/Profile'
+import { Exercise } from '@/screens/Exercise'
+import { History } from '@/screens/History'
+import { Home } from '@/screens/Home'
+import { Profile } from '@/screens/Profile'
 
 type AppRoutes = {
   home: undefined

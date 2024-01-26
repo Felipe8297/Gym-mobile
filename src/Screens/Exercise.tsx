@@ -7,7 +7,6 @@ import {
   HStack,
   Icon,
   Image,
-  ScrollView,
   Text,
   useToast,
   VStack,
@@ -30,6 +29,7 @@ type RouteParams = {
 }
 
 export function Exercise() {
+  const [sendingRegister, setSendingRegister] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [exercise, setExercise] = useState<ExerciseDTO>({} as ExerciseDTO)
 
@@ -60,6 +60,34 @@ export function Exercise() {
       })
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  async function handleMarkAsDone() {
+    try {
+      setSendingRegister(true)
+      const response = await api.post('/history', { exercise_id: exerciseId })
+
+      if (response.status === 201) {
+        toast.show({
+          title: 'Exercício marcado como realizado!',
+          placement: 'top',
+          bgColor: 'green.500',
+        })
+        navigation.navigate('history')
+      }
+    } catch (error) {
+      const isAppError = error instanceof AppError
+      const title = isAppError
+        ? error.message
+        : 'Não foi possível marcar o exercício como realizado. Tente novamente mais tarde'
+      toast.show({
+        title,
+        placement: 'top',
+        bgColor: 'red.500',
+      })
+    } finally {
+      setSendingRegister(false)
     }
   }
 
@@ -124,7 +152,12 @@ export function Exercise() {
                   {exercise.repetitions} repetições
                 </Text>
               </HStack>
-              <Button title="Marcar como realizado" />
+              <Button
+                title="Marcar como realizado"
+                onPress={handleMarkAsDone}
+                isLoading={sendingRegister}
+                _loading={{ bgColor: 'green.500' }}
+              />
             </Center>
           </Box>
         </VStack>
