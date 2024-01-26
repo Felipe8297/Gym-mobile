@@ -30,24 +30,20 @@ type ProfileFormData = {
   confirmedPassword: string
 }
 
-const ProfileSchema = yup.object({
+const profileSchema = yup.object({
   name: yup.string().required('Informe o nome.'),
   email: yup.string().required('Informe o e-mail.').email('E-mail inválido.'),
   oldPassword: yup
     .string()
     .required('Informe a senha antiga.')
     .min(6, 'A senha deve conter 6 caracteres.'),
-  password: yup
-    .string()
-    .required('Informe a nova senha')
-    .min(6, 'A senha deve conter 6 caracteres.'),
+  password: yup.string().min(6, 'A senha deve conter 6 caracteres.'),
   confirmedPassword: yup
     .string()
-    .required('Confirme a nova senha.')
     .oneOf([yup.ref('password'), null], 'As senhas não coincidem.'),
 })
 
-type FormData = yup.InferType<typeof ProfileSchema>
+type FormData = yup.InferType<typeof profileSchema>
 
 export function Profile() {
   const [photoIsLoading, setPhotoIsLoading] = useState(false)
@@ -65,7 +61,7 @@ export function Profile() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
-    resolver: yupResolver(ProfileSchema),
+    resolver: yupResolver(profileSchema),
     defaultValues: {
       name: user.name,
       email: user.email,
@@ -233,6 +229,7 @@ export function Profile() {
             mt={4}
             onPress={handleSubmit(handleUpdateProfile)}
             isLoading={isSubmitting}
+            _loading={{ bg: 'green.500' }}
           />
         </Center>
       </ScrollView>
