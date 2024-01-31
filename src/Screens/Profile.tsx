@@ -16,6 +16,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { TouchableOpacity } from 'react-native'
 import * as yup from 'yup'
 
+import defaultUserPhoto from '@/assets/userPhotoDefault.png'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
 import { ScreenHeader } from '@/components/ScreenHeader'
@@ -61,10 +62,6 @@ type FormData = yup.InferType<typeof profileSchema>
 
 export function Profile() {
   const [photoIsLoading, setPhotoIsLoading] = useState(false)
-  const [userImage, setUserImage] = useState(
-    'https://image-cdn.essentiallysports.com/wp-content/uploads/Chris-Bumstead-1-1-740x710.jpg',
-  )
-
   const toast = useToast()
   const { user, updateUserProfile } = useAuth()
 
@@ -112,18 +109,30 @@ export function Profile() {
         }
         const fileExtension = res.assets[0].uri.split('.').pop()
         const photoFile = {
-          name: `${user.id}.${fileExtension}`.toLowerCase(),
+          name: `${user.name}.${fileExtension}`.toLowerCase(),
           uri: res.assets[0].uri,
           type: `${res.assets[0].type}/${fileExtension}`,
         } as any
+
         const userPhotoUpload = new FormData()
+
         userPhotoUpload.append('avatar', photoFile)
 
-        await api.patch('/users/avatar', userPhotoUpload, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
+        const avatarResponse = await api.patch(
+          '/users/avatar',
+          userPhotoUpload,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
           },
-        })
+        )
+
+        const userUpdated = user
+        userUpdated.avatar = avatarResponse.data.avatar
+
+        updateUserProfile(userUpdated)
+
         toast.show({
           title: 'Foto atualizada com sucesso.',
           placement: 'top',
@@ -188,9 +197,13 @@ export function Profile() {
           ) : (
             <UserPhoto
               size={33}
-              source={{
-                uri: userImage,
-              }}
+              source={
+                user.avatar
+                  ? {
+                      uri: `${api.defaults.baseURL}/avatar/${user.avatar}`,
+                    }
+                  : defaultUserPhoto
+              }
             />
           )}
           <TouchableOpacity onPress={handleUserImage}>
