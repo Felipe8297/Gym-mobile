@@ -21,6 +21,8 @@ import { Input } from '@/components/Input'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import { UserPhoto } from '@/components/UserPhoto'
 import { useAuth } from '@/hooks/useAuth'
+import { api } from '@/services/api'
+import { AppError } from '@/utils/AppError'
 
 type ProfileFormData = {
   name: string
@@ -33,14 +35,26 @@ type ProfileFormData = {
 const profileSchema = yup.object({
   name: yup.string().required('Informe o nome.'),
   email: yup.string().required('Informe o e-mail.').email('E-mail inválido.'),
-  oldPassword: yup
+  oldPassword: yup.string(),
+  password: yup
     .string()
-    .required('Informe a senha antiga.')
-    .min(6, 'A senha deve conter 6 caracteres.'),
-  password: yup.string().min(6, 'A senha deve conter 6 caracteres.'),
+    .required('Informe a nova senha.')
+    .min(6, 'A senha deve conter 6 caracteres.')
+    .nullable()
+    .transform((value) => value || null),
   confirmedPassword: yup
     .string()
-    .oneOf([yup.ref('password'), null], 'As senhas não coincidem.'),
+    .nullable()
+    .transform((value) => value || null)
+    .oneOf([yup.ref('password'), null], 'As senhas não coincidem.')
+    .when('password', {
+      is: (Field: any) => Field,
+      then: (schema) =>
+        schema
+          .nullable()
+          .required('Informe a confirmação da senha')
+          .transform((value) => value || null),
+    }),
 })
 
 type FormData = yup.InferType<typeof profileSchema>
@@ -52,9 +66,7 @@ export function Profile() {
   )
 
   const toast = useToast()
-  const { user } = useAuth()
-
-  console.log(user)
+  const { user, updateUserProfile } = useAuth()
 
   const {
     control,
@@ -98,7 +110,25 @@ export function Profile() {
             bgColor: 'red.500',
           })
         }
-        setUserImage(res.assets[0].uri)
+        const fileExtension = res.assets[0].uri.split('.').pop()
+        const photoFile = {
+          name: `${user.id}.${fileExtension}`.toLowerCase(),
+          uri: res.assets[0].uri,
+          type: `${res.assets[0].type}/${fileExtension}`,
+        } as any
+        const userPhotoUpload = new FormData()
+        userPhotoUpload.append('avatar', photoFile)
+
+        await api.patch('/users/avatar', userPhotoUpload, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
+        toast.show({
+          title: 'Foto atualizada com sucesso.',
+          placement: 'top',
+          bgColor: 'green.500',
+        })
       }
     } catch (error) {
       // do nothing
@@ -107,9 +137,39 @@ export function Profile() {
     }
   }
 
-  async function handleUpdateProfile(data: ProfileFormData) {
-    await new Promise((resolve) => setTimeout(resolve, 3000))
-    console.log(data)
+  async function handleUpdateProfile({
+    name,
+    password,
+    oldPassword,
+  }: ProfileFormData) {
+    try {
+      const userUpdated = user
+      userUpdated.name = name
+
+      await new Promise((resolve) => setTimeout(resolve, 3000))
+
+      await api.put('/users', {
+        name,
+        old_password: oldPassword,
+        password,
+      })
+      await updateUserProfile(userUpdated)
+      toast.show({
+        title: 'Perfil atualizado com sucesso.',
+        placement: 'top',
+        bgColor: 'green.500',
+      })
+    } catch (error) {
+      const isAppError = error instanceof AppError
+      const title = isAppError
+        ? error.message
+        : 'Não foi possível atualiza o perfil. Tente novamente mais tarde.'
+      toast.show({
+        title,
+        placement: 'top',
+        bgColor: 'red.500',
+      })
+    }
   }
 
   return (
